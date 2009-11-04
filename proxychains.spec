@@ -19,29 +19,31 @@ app.
 %setup -q
 
 %build
-%{configure}
+%configure
 %{__make} \
 	CFLAGS="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
+
+# no -devel
+rm -f $RPM_BUILD_ROOT%{_libdir}/libproxychains.a
+rm -f $RPM_BUILD_ROOT%{_libdir}/libproxychains.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/libproxychains.so
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post
-/sbin/ldconfig
-
-%postun
-/sbin/ldconfig
+%post	-p /sbin/ldconfig
+%postun	-p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
 %doc README
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}.conf
-%attr(755,root,root) %{_bindir}/*
-%attr(755,root,root) %{_libdir}/libproxychains.so.3.0.0
-%{_libdir}/libproxychains.la
+%attr(755,root,root) %{_bindir}/proxychains
+%attr(755,root,root) %{_bindir}/proxyresolv
+%attr(755,root,root) %{_libdir}/libproxychains.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libproxychains.so.3
